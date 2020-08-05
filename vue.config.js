@@ -1,5 +1,5 @@
 module.exports = {
-    publicPath: '',
+    publicPath: 'https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/',
     chainWebpack: config => {
         config
             .plugin('html')
