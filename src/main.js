@@ -9,6 +9,7 @@ import VueJsonp from 'vue-jsonp'
 import qs from 'qs'
 import '@/permission'
 import '@/interceptors'
+import util from '@/util'
 
 Vue.config.productionTip = false
 
@@ -18,6 +19,8 @@ Vue.use(VueJsonp)
 
 Vue.prototype.$env = process.env
 Vue.prototype.$qs = qs
+Vue.prototype.$util = util
+
 
 new Vue({
     el: '#app',

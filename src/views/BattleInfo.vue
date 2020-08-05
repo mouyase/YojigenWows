@@ -3,7 +3,7 @@
     <el-row>
       <el-col :span="12">
         <el-table
-            :data="tableDataL.players"
+            :data="tableDataL"
             border
             style="width: 100%">
           <el-table-column
@@ -51,7 +51,7 @@
       </el-col>
       <el-col :span="12">
         <el-table
-            :data="tableDataR.players"
+            :data="tableDataR"
             border
             style="width: 100%">
           <el-table-column
@@ -110,14 +110,10 @@ export default {
       lastBattleData: {},
       timeout: null,
       lastStatus: true,
-      tableDataL: {
-        players: [],
-      },
-      tableDataR: {
-        players: [],
-      },
-      playersData: new Map(),
-      shipsData: new Map(),
+      tableDataL: [],
+      tableDataR: [],
+      shipsMap: new Map(),
+      playersMap: new Map(),
     }
   },
   mounted() {
@@ -139,112 +135,6 @@ export default {
         }
       })
     },
-    getShipData() {
-      let players = this.battleData.vehicles
-      let shipsIDString = ''
-      players.forEach((value, index) => {
-        shipsIDString = shipsIDString + value.shipId
-        if (index < players.length - 1) {
-          shipsIDString = shipsIDString + ','
-        }
-      })
-      this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/ships/', this.$qs.stringify({
-        application_id: this.$env.VUE_APP_APPLICATION_ID,
-        ship_id: shipsIDString,
-        fields: 'name',
-        language: 'zh-cn',
-      })).then(response => {
-        let ships = response.data.data
-        for (let shipID in ships) {
-          this.shipsData.set(parseInt(shipID), ships[shipID])
-        }
-      })
-    },
-    getPlayerData() {
-      let accountIDsString = ''
-      let playersNameString = ''
-
-      let players = this.battleData.vehicles
-      this.playersData = new Map()
-      players.forEach((value, index) => {
-        this.playersData.set(value.name, {
-          name: value.name,
-          account_id: 0,
-          shipId: value.shipId,
-          relation: value.relation,
-          ship: '',
-          matches: '',
-          winrate: '',
-          avgdmg: '',
-          ship_matches: '',
-          ship_winrate: '',
-          ship_avgdmg: '',
-          private: false,
-        })
-        playersNameString = playersNameString + value.name
-        if (index < players.length - 1) {
-          playersNameString = playersNameString + ','
-        }
-      })
-      this.$http.post('https://api.worldofwarships.asia/wows/account/list/', this.$qs.stringify({
-        application_id: this.$env.VUE_APP_APPLICATION_ID,
-        search: playersNameString,
-        type: 'exact',
-      })).then(response => {
-        let data = response.data.data
-        data.forEach((value, index) => {
-          accountIDsString = accountIDsString + value.account_id
-          let player = this.playersData.get(value.nickname)
-          player.account_id = value.account_id
-          this.$http.post('https://api.worldofwarships.asia/wows/ships/stats/', this.$qs.stringify({
-            application_id: this.$env.VUE_APP_APPLICATION_ID,
-            account_id: player.account_id,
-            ship_id: player.shipId,
-          })).then(response => {
-            let playerData = response.data.data[value.account_id]
-            let player = this.playersData.get(value.nickname)
-            if (playerData) {
-              player.ship_matches = playerData[0].pvp.battles
-              player.ship_winrate = ((playerData[0].pvp.wins / playerData[0].pvp.battles) * 100).toFixed(2) + "%"
-              player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
-            }
-          })
-          this.playersData.set(value.nickname, player)
-          if (index < data.length - 1) {
-            accountIDsString = accountIDsString + ','
-          }
-        })
-        this.$http.post('https://api.worldofwarships.asia/wows/account/info/', this.$qs.stringify({
-          application_id: this.$env.VUE_APP_APPLICATION_ID,
-          account_id: accountIDsString,
-        })).then(response => {
-          let data = response.data.data
-          for (let account_id in data) {
-            let playerData = data[account_id]
-            let player = this.playersData.get(playerData.nickname)
-            if (playerData.statistics) {
-              player.matches = playerData.statistics.pvp.battles
-              player.winrate = ((playerData.statistics.pvp.wins / playerData.statistics.pvp.battles) * 100).toFixed(2) + "%"
-              player.avgdmg = parseInt(((playerData.statistics.pvp.damage_dealt / playerData.statistics.pvp.battles) / 100)) * 100
-            }
-          }
-        })
-      })
-    },
-    createData() {
-      this.tableDataL['players'] = []
-      this.tableDataR['players'] = []
-      this.playersData.forEach((value, index) => {
-        if (this.shipsData.get(value.shipId)) {
-          value.ship = this.shipsData.get(value.shipId).name
-        }
-        if (value.relation !== 2) {
-          this.tableDataL.players.push(value)
-        } else {
-          this.tableDataR.players.push(value)
-        }
-      })
-    },
     success(response) {
       this.battleData = response.data
       if (this.battleData.dateTime !== this.lastBattleData.dateTime) {
@@ -255,8 +145,7 @@ export default {
           position: 'bottom-right',
           duration: 5000,
         });
-        this.getPlayerData()
-        this.getShipData()
+        this.createPlayersMap()
       }
       if (!this.lastStatus) {
         this.$notify.success({
@@ -266,7 +155,7 @@ export default {
           duration: 5000,
         });
       }
-      this.createData()
+      this.formatData()
       this.lastStatus = true
       this.setTimeout(1000)
     },
@@ -299,7 +188,130 @@ export default {
           clearTimeout(this.timeout)
         }
       }, time)
-    }
+    },
+    /*创建玩家数据表*/
+    createPlayersMap() {
+      this.playersMap = new Map()
+      let players = this.battleData.vehicles
+      players.forEach((player, index) => {
+        this.playersMap.set(player.name, {
+          name: player.name,
+          accountID: 0,
+          shipID: player.shipId,
+          relation: player.relation,
+          ship: '',
+          matches: '',
+          winrate: '',
+          avgdmg: '',
+          ship_matches: '',
+          ship_winrate: '',
+          ship_avgdmg: '',
+          private: false,
+        })
+      })
+      this.getPlayersData()
+      this.getShipsData()
+    },
+    /*获取玩家数据*/
+    getPlayersData() {
+      let accountIDsString = ''
+      let playersNameString = ''
+
+      this.playersMap.forEach((player, index) => {
+        playersNameString = playersNameString + player.name + ','
+      })
+      playersNameString = playersNameString.substr(0, playersNameString.length - 1)
+      this.$http.post('https://api.worldofwarships.asia/wows/account/list/', this.$qs.stringify({
+        application_id: this.$env.VUE_APP_APPLICATION_ID,
+        search: playersNameString,
+        type: 'exact',
+      })).then(response => {
+        let data = response.data.data
+        data.forEach((value, index) => {
+          let player = this.playersMap.get(value.nickname)
+          player.accountID = value.account_id
+        })
+        this.playersMap.forEach((player, index) => {
+          accountIDsString = accountIDsString + player.accountID + ','
+        })
+        accountIDsString = accountIDsString.substr(0, accountIDsString.length - 1)
+        this.$http.post('https://api.worldofwarships.asia/wows/account/info/', this.$qs.stringify({
+          application_id: this.$env.VUE_APP_APPLICATION_ID,
+          account_id: accountIDsString,
+        })).then(response => {
+          let data = response.data.data
+          for (let accountID in data) {
+            let playerData = data[accountID]
+            let player = this.playersMap.get(playerData.nickname)
+            if (playerData.statistics) {
+              player.matches = playerData.statistics.pvp.battles
+              player.winrate = this.$util.calculatedPercentString(playerData.statistics.pvp.wins, playerData.statistics.pvp.battles, 2)
+              player.avgdmg = parseInt(((playerData.statistics.pvp.damage_dealt / playerData.statistics.pvp.battles) / 100)) * 100
+              player.private = false
+            } else {
+              player.matches = '无数据'
+              player.winrate = '无数据'
+              player.avgdmg = '无数据'
+              player.private = true
+            }
+          }
+        })
+        this.playersMap.forEach((player, index) => {
+          this.$http.post('https://api.worldofwarships.asia/wows/ships/stats/', this.$qs.stringify({
+            application_id: this.$env.VUE_APP_APPLICATION_ID,
+            account_id: player.accountID,
+            ship_id: player.shipID,
+          })).then(response => {
+            let playerData = response.data.data[player.accountID]
+            if (playerData) {
+              player.ship_matches = playerData[0].pvp.battles
+              player.ship_winrate = this.$util.calculatedPercentString(playerData[0].pvp.wins, playerData[0].pvp.battles, 2)
+              player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
+              player.private = false
+            } else {
+              player.ship_matches = '无数据'
+              player.ship_winrate = '无数据'
+              player.ship_avgdmg = '无数据'
+              player.private = true
+            }
+          })
+        })
+      })
+    },
+    /*获取船只数据*/
+    getShipsData() {
+      let shipsIDString = ''
+      this.playersMap.forEach((player, index) => {
+        shipsIDString = shipsIDString + player.shipID + ','
+      })
+      shipsIDString = shipsIDString.substr(0, shipsIDString.length - 1)
+      this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/ships/', this.$qs.stringify({
+        application_id: this.$env.VUE_APP_APPLICATION_ID,
+        ship_id: shipsIDString,
+        fields: 'name',
+        language: 'zh-cn',
+      })).then(response => {
+        let ships = response.data.data
+        for (let shipID in ships) {
+          this.shipsMap.set(parseInt(shipID), ships[shipID])
+        }
+      })
+    },
+    /*后续处理数据*/
+    formatData() {
+      this.tableDataL = []
+      this.tableDataR = []
+      this.playersMap.forEach((player, index) => {
+        if (this.shipsMap.size !== 0) {
+          player.ship = this.shipsMap.get(player.shipID).name
+        }
+        if (player.relation !== 2) {
+          this.tableDataL.push(player)
+        } else {
+          this.tableDataR.push(player)
+        }
+      })
+    },
   }
 }
 </script>
