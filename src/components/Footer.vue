@@ -1,6 +1,8 @@
 <template>
   <div class="footer">
-    版本:0.0.1-{{ this.$env.VUE_APP_GIT_COMMIT }}
+    <el-link type="info" :href="'https://github.com/mouyase/YojigenWows/commit/'+this.$env.VUE_APP_GIT_COMMIT">
+      版本:0.0.1-{{ this.$env.VUE_APP_GIT_COMMIT }}
+    </el-link>
   </div>
 </template>
 

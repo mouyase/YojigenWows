@@ -19,7 +19,7 @@ jobs:
     - name: WriteCommit
       run: |
         COMMIT=$(git log -1 | awk 'NR==1 {print substr($2,0,40)}')
-        echo VUE_APP_GIT_COMMIT=$COMMIT >> .env.development.local
+        echo VUE_APP_GIT_COMMIT=$COMMIT >> .env.production.local
 
     - name: Build
       run: |
