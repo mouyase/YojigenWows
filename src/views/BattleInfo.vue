@@ -196,6 +196,19 @@ export default {
           accountIDsString = accountIDsString + value.account_id
           let player = this.playersData.get(value.nickname)
           player.account_id = value.account_id
+          this.$http.post('https://api.worldofwarships.asia/wows/ships/stats/', this.$qs.stringify({
+            application_id: this.$env.VUE_APP_APPLICATION_ID,
+            account_id: player.account_id,
+            ship_id: player.shipId,
+          })).then(response => {
+            let playerData = response.data.data[value.account_id]
+            let player = this.playersData.get(value.nickname)
+            if (playerData) {
+              player.ship_matches = playerData[0].pvp.battles
+              player.ship_winrate = ((playerData[0].pvp.wins / playerData[0].pvp.battles) * 100).toFixed(2) + "%"
+              player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
+            }
+          })
           this.playersData.set(value.nickname, player)
           if (index < data.length - 1) {
             accountIDsString = accountIDsString + ','
@@ -239,6 +252,8 @@ export default {
         this.$notify.success({
           title: '已连接到对局',
           message: '对局数据获取中，请稍作等待',
+          position: 'bottom-right',
+          duration: 5000,
         });
         this.getPlayerData()
         this.getShipData()
@@ -247,6 +262,8 @@ export default {
         this.$notify.success({
           title: '已连接到对局',
           message: '对局数据获取中，请稍作等待',
+          position: 'bottom-right',
+          duration: 5000,
         });
       }
       this.createData()
@@ -258,6 +275,7 @@ export default {
         title: '无法连接到游戏服务',
         dangerouslyUseHTMLString: true,
         message: '请确保数据服务已安装<br>如未安装可以<a href="/YojigenWowsInfoServerSetup.exe"><strong>点击这里下载</strong></a><br>如已安装可以<a href="YojigenWowsInfoServer://open"><strong>点击这里启动</strong></a>',
+        position: 'bottom-right',
         duration: 10000,
       });
       this.lastStatus = false
@@ -267,6 +285,7 @@ export default {
       this.$notify.warning({
         title: '无法找到对局',
         message: '若已开始对局，请您等待片刻',
+        position: 'bottom-right',
         duration: 5000,
       });
       this.lastStatus = false
@@ -274,15 +293,16 @@ export default {
     },
     setTimeout(time) {
       this.timeout = setTimeout(() => {
-        this.getBattleData()
+        if (this.$route.name === 'BattleInfo') {
+          this.getBattleData()
+        } else {
+          clearTimeout(this.timeout)
+        }
       }, time)
     }
   }
 }
 </script>
 
-<
-style
-lang = "scss"
-scoped >
-< /style>
+<style lang="scss" scoped>
+</style>
