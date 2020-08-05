@@ -9,6 +9,7 @@
           <el-table-column
               prop="name"
               label="玩家昵称"
+              width="200"
           >
           </el-table-column>
           <el-table-column
@@ -56,6 +57,7 @@
           <el-table-column
               prop="name"
               label="玩家昵称"
+              width="200"
           >
           </el-table-column>
           <el-table-column
@@ -163,6 +165,7 @@ export default {
       let playersNameString = ''
 
       let players = this.battleData.vehicles
+      this.playersData = new Map()
       players.forEach((value, index) => {
         this.playersData.set(value.name, {
           name: value.name,
@@ -254,7 +257,7 @@ export default {
       this.$notify.error({
         title: '无法连接到游戏服务',
         dangerouslyUseHTMLString: true,
-        message: '请确保数据服务已安装<br>如未安装可以<a href="https://www.baidu.com"><strong>点击这里下载</strong></a><br>如已安装可以<a href="YojigenWowsInfoServer://open"><strong>点击这里启动</strong></a>',
+        message: '请确保数据服务已安装<br>如未安装可以<a href="https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/YojigenWowsInfoServerSetup.exe"><strong>点击这里下载</strong></a><br>如已安装可以<a href="YojigenWowsInfoServer://open"><strong>点击这里启动</strong></a>',
         duration: 10000,
       });
       this.lastStatus = false
