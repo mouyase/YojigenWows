@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>授权登录</title>
+    <script type="text/javascript">
+        const url = window.location.href
+        window.onload = function () {
+            let params = url.split('?')[1].split('&')
+            let oauth = {}
+            params.forEach(function (value, index) {
+                if (value) {
+                    oauth[value.split('=')[0]] = value.split('=')[1]
+                }
+            })
+            if (oauth.account_id) {
+                oauth.account_id = parseInt(oauth.account_id)
+            }
+            if (oauth.expires_at) {
+                oauth.expires_at = parseInt(oauth.expires_at)
+            }
+            localStorage.setItem('oauth', JSON.stringify(oauth))
+            window.location.href = '/#/'
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>
