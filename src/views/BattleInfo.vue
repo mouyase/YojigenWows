@@ -257,7 +257,7 @@ export default {
       this.$notify.error({
         title: '无法连接到游戏服务',
         dangerouslyUseHTMLString: true,
-        message: '请确保数据服务已安装<br>如未安装可以<a href="https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/YojigenWowsInfoServerSetup.exe"><strong>点击这里下载</strong></a><br>如已安装可以<a href="YojigenWowsInfoServer://open"><strong>点击这里启动</strong></a>',
+        message: '请确保数据服务已安装<br>如未安装可以<a href="/YojigenWowsInfoServerSetup.exe"><strong>点击这里下载</strong></a><br>如已安装可以<a href="YojigenWowsInfoServer://open"><strong>点击这里启动</strong></a>',
         duration: 10000,
       });
       this.lastStatus = false
