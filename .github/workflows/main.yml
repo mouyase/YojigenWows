@@ -18,7 +18,7 @@ jobs:
 
     - name: Build
       run: |
-        npm i yarn -g
+        sudo npm i yarn -g
         yarn
         yarn run build
         
