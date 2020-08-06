@@ -227,7 +227,7 @@ export default {
           this.playersMap.set(player.name, {
             name: player.name,
             clan: '',
-            displayName: '',
+            displayName: player.name,
             accountID: 0,
             shipID: player.shipId,
             relation: player.relation,
@@ -244,6 +244,8 @@ export default {
         } else {
           this.playersMap.set(player.name, {
             name: player.name,
+            clan: '',
+            displayName: player.name,
             accountID: 0,
             shipID: player.shipId,
             relation: player.relation,
