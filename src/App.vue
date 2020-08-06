@@ -25,10 +25,15 @@ export default {
   },
   mounted() {
     this.$http.get('https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/zh_CN.json')
-        // this.$http.get('/zh_CN.json')
         .then(response => {
           localStorage.setItem('zh_CN', JSON.stringify(response.data))
         })
+    this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/info/', this.$qs.stringify({
+      application_id: this.$env.VUE_APP_APPLICATION_ID,
+      language: 'zh-cn',
+    })).then(response => {
+      localStorage.setItem('encyclopedia', JSON.stringify(response.data.data))
+    })
   }
 }
 </script>
@@ -37,10 +42,8 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-}
-
-a {
-  text-decoration: none;
+  background-color: #102031;
+  color: #eee;
 }
 
 #app {

@@ -4,10 +4,8 @@
       <el-table
           :data="tableDataL"
           style="width: 100%"
-          :row-style="tableRowStyle"
+          :cell-style="tableCellStyle"
           :header-cell-style="tableHeaderCellStyleL">
-<!--          :show-summary="true"-->
-<!--          :summary-method="tableSummaryL"-->
         <el-table-column label="我的团队">
           <el-table-column
               prop="displayName"
@@ -21,6 +19,17 @@
               label="使用船只"
               width="200"
               :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+              <div style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
+                <el-image style="width: 24px; height: 24px;" :src="scope.row.shipIconURL"></el-image>
+                <span style="margin-left: 8px" v-if="scope.row.ship.is_premium">{{
+                    tierStrings[scope.row.ship.tier]
+                  }} {{ scope.row.ship.name }}</span>
+                <span style="margin-left: 8px" v-if="!scope.row.ship.is_premium">{{
+                    tierStrings[scope.row.ship.tier]
+                  }} {{ scope.row.ship.name }}</span>
+              </div>
+            </template>
           </el-table-column>
           <el-table-column
               align="center"
@@ -65,7 +74,7 @@
       <el-table
           :data="tableDataR"
           style="width: 100%"
-          :row-style="tableRowStyle"
+          :cell-style="tableCellStyle"
           :header-cell-style="tableHeaderCellStyleR">
         <el-table-column label="敌军">
           <el-table-column
@@ -76,10 +85,20 @@
           >
           </el-table-column>
           <el-table-column
-              prop="ship.name"
               label="使用船只"
               width="200"
               :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+              <div style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
+                <el-image style="width: 24px; height: 24px;" :src="scope.row.shipIconURL"></el-image>
+                <span style="margin-left: 8px" v-if="scope.row.ship.is_premium">{{
+                    tierStrings[scope.row.ship.tier]
+                  }} {{ scope.row.ship.name }}</span>
+                <span style="margin-left: 8px" v-if="!scope.row.ship.is_premium">{{
+                    tierStrings[scope.row.ship.tier]
+                  }} {{ scope.row.ship.name }}</span>
+              </div>
+            </template>
           </el-table-column>
           <el-table-column
               align="center"
@@ -136,24 +155,67 @@ export default {
       tableDataR: [],
       shipsMap: new Map(),
       playersMap: new Map(),
+
+      tierStrings: {
+        1: 'I',
+        2: 'II',
+        3: 'III',
+        4: 'IV',
+        5: 'V',
+        6: 'VI',
+        7: 'VII',
+        8: 'VIII',
+        9: 'IX',
+        10: 'X',
+      },
+      encyclopedia: JSON.parse(localStorage.getItem('encyclopedia')),
     }
   },
   mounted() {
     this.getBattleData()
   },
   methods: {
-    tableRowStyle({row, rowIndex}) {
-      if (row.relation === 0) {
-        return {
-          'background': "rgb(240, 249, 235)",
-        }
-      }
+    tableCellStyle({row, column, rowIndex, columnIndex}) {
       if (row.private) {
         return {
-          'background': 'rgb(244, 244, 245)',
+          'background': "#333",
+          'color': "#DDD",
+          'font-weight': 'bold',
         }
       }
-      return '';
+      if (columnIndex == 0 && row.relation === 0) {
+        return {
+          'background': "#555",
+          'color': "#FC8",
+          'font-weight': 'bold',
+        }
+      }
+      if (columnIndex == 0) {
+        return {
+          'background': "#555",
+          'color': "#DDD",
+          'font-weight': 'bold',
+        }
+      }
+      if (columnIndex == 1) {
+        if (row.ship.is_premium) {
+          return {
+            'background': "#555",
+            'color': "#FC8",
+            'font-weight': 'bold',
+          }
+        } else {
+          return {
+            'background': "#555",
+            'color': "#DDD",
+            'font-weight': 'bold',
+          }
+        }
+      }
+      return {
+        'background': "#555555FF",
+        'color': "#DDD",
+      }
     },
     tableHeaderCellStyleL({row, rowIndex, columnIndex}) {
       if (rowIndex === 0 && columnIndex === 0)
@@ -162,6 +224,12 @@ export default {
           'color': "#FFFFFF",
           'font-size': "24px",
         }
+      if (rowIndex === 1) {
+        return {
+          'background': "rgb(225, 243, 216)",
+          'color': "#333333",
+        }
+      }
       return ''
     },
     tableHeaderCellStyleR({row, rowIndex, columnIndex}) {
@@ -171,6 +239,12 @@ export default {
           'color': "#FFFFFF",
           'font-size': "24px",
         }
+      if (rowIndex === 1) {
+        return {
+          'background': "rgb(253, 226, 226)",
+          'color': "#666666",
+        }
+      }
       return ''
     },
     // tableSummaryL(params) {
@@ -178,7 +252,6 @@ export default {
     //   return ['哈哈']
     // },
     getBattleData() {
-      clearTimeout(this.timeout)
       this.$http.get('http://127.0.0.1:65000/tempArenaInfo.json')
           .then(response => {
             this.success(response)
@@ -237,6 +310,7 @@ export default {
       this.setTimeout(5000)
     },
     setTimeout(time) {
+      clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         if (this.$route.name === 'BattleInfo') {
           this.getBattleData()
@@ -260,6 +334,7 @@ export default {
             shipID: player.shipId,
             relation: player.relation,
             ship: {},
+            shipIconURL: '',
             typeRank: 0,
             tierRank: 0,
             nationRank: 0,
@@ -280,6 +355,7 @@ export default {
             shipID: player.shipId,
             relation: player.relation,
             ship: {},
+            shipIconURL: '',
             typeRank: 0,
             tierRank: 0,
             nationRank: 0,
@@ -461,6 +537,11 @@ export default {
             player.typeRank = 3
           }
           player.tierRank = player.ship.tier
+        }
+        if (ship.is_premium) {
+          player.shipIconURL = this.encyclopedia.ship_type_images[ship.type].image_premium
+        } else {
+          player.shipIconURL = this.encyclopedia.ship_type_images[ship.type].image_elite
         }
         tempTabelData.push(player)
       })

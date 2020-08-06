@@ -24,14 +24,14 @@ export default {
     }
   },
   methods: {
-    query() {
-      this.$http.post('https://api.worldofwarships.asia/wows/account/list/', this.$qs.stringify({
-        application_id: this.$env.VUE_APP_APPLICATION_ID,
-        search: this.queryNickName,
-      })).then(response => {
-        console.log(response)
-      })
-    },
+    // query() {
+    //   this.$http.post('https://api.worldofwarships.asia/wows/account/list/', this.$qs.stringify({
+    //     application_id: this.$env.VUE_APP_APPLICATION_ID,
+    //     search: this.queryNickName,
+    //   })).then(response => {
+    //     console.log(response)
+    //   })
+    // },
   }
 }
 </script>
