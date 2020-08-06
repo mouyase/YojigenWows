@@ -227,12 +227,14 @@ export default {
           this.playersMap.set(player.name, {
             name: player.name,
             clan: '',
-            displayName: player.name,
+            displayName: '',
             accountID: 0,
             shipID: player.shipId,
             relation: player.relation,
-            ship: '',
-            rank: 0,
+            ship: {},
+            typeRank: 0,
+            tierRank: 0,
+            nationRank: 0,
             matches: '',
             winrate: '',
             avgdmg: '',
@@ -245,12 +247,14 @@ export default {
           this.playersMap.set(player.name, {
             name: player.name,
             clan: '',
-            displayName: player.name,
+            displayName: '',
             accountID: 0,
             shipID: player.shipId,
             relation: player.relation,
-            ship: '',
-            rank: 0,
+            ship: {},
+            typeRank: 0,
+            tierRank: 0,
+            nationRank: 0,
             matches: '电脑',
             winrate: '电脑',
             avgdmg: '电脑',
@@ -300,10 +304,11 @@ export default {
               extra: 'clan',
               fields: 'clan.tag',
             })).then(response => {
-              let clan = response.data.data[player.accountID].clan
-              if (clan) {
-                player.clan = clan.tag
-                player.displayName = '[' + player.clan + ']' + player.name
+              if (response.data.data[player.accountID]) {
+                let clan = response.data.data[player.accountID].clan
+                if (clan) {
+                  player.clan = clan.tag
+                }
               }
             })
           }
@@ -388,10 +393,13 @@ export default {
 
       let tempTabelData = [], tempTableDataL = [], tempTableDataR = []
 
-      let mAirCarrier = [], mBattleship = [], mCruiser = [], mDestroyer = []
-
       this.playersMap.forEach((player, index) => {
         let ship = this.shipsMap.get(player.shipID)
+        if (player.clan) {
+          player.displayName = '[' + player.clan + ']' + player.name
+        } else {
+          player.displayName = player.name
+        }
         if (ship) {
           player.ship = ship
           if (ship.nation === 'usa') {
@@ -416,20 +424,18 @@ export default {
             player.rank = 9
           }
           if (ship.type === 'AirCarrier') {
-            mAirCarrier.push(player)
+            player.typeRank = 0
           } else if (ship.type === 'Battleship') {
-            mBattleship.push(player)
+            player.typeRank = 1
           } else if (ship.type === 'Cruiser') {
-            mCruiser.push(player)
+            player.typeRank = 2
           } else if (ship.type === 'Destroyer') {
-            mDestroyer.push(player)
+            player.typeRank = 3
           }
+          player.tierRank = player.ship.tier
         }
+        tempTabelData.push(player)
       })
-      tempTabelData = tempTabelData.concat(this.formartRank(mAirCarrier))
-      tempTabelData = tempTabelData.concat(this.formartRank(mBattleship))
-      tempTabelData = tempTabelData.concat(this.formartRank(mCruiser))
-      tempTabelData = tempTabelData.concat(this.formartRank(mDestroyer))
       tempTabelData.forEach((player, index) => {
         if (player.relation !== 2) {
           tempTableDataL.push(player)
@@ -437,19 +443,15 @@ export default {
           tempTableDataR.push(player)
         }
       })
-      this.tableDataL = tempTableDataL
-      this.tableDataR = tempTableDataR
+      this.tableDataL = this.formartRank(tempTableDataL)
+      this.tableDataR = this.formartRank(tempTableDataR)
     },
-    /*对玩家按照船只国别进行排序*/
+    /*对玩家按照类型，等级，国别进行排序*/
     formartRank(players) {
       let tempPlayers = players
-      for (var i = 1; i < tempPlayers.length; i++) {
-        for (var j = 0; j < tempPlayers.length - i; j++) {
-          if (tempPlayers[j].rank > tempPlayers[j + 1].rank) {
-            tempPlayers[j] = [tempPlayers[j + 1], tempPlayers[j + 1] = tempPlayers[j]][0];
-          }
-        }
-      }
+      tempPlayers.sort((a, b) => {
+        return a.typeRank - b.typeRank || b.tierRank - a.tierRank || a.nationRank - b.nationRank
+      })
       return tempPlayers
     },
   }
