@@ -4,8 +4,8 @@
       <el-col :span="12">
         <el-table
             :data="tableDataL"
-            border
-            style="width: 100%">
+            style="width: 100%"
+            :row-style="tableRowStyle">
           <el-table-column
               prop="name"
               label="玩家昵称"
@@ -13,7 +13,7 @@
           >
           </el-table-column>
           <el-table-column
-              prop="ship"
+              prop="ship.name"
               label="使用船只"
               width="120">
           </el-table-column>
@@ -52,8 +52,8 @@
       <el-col :span="12">
         <el-table
             :data="tableDataR"
-            border
-            style="width: 100%">
+            style="width: 100%"
+            :row-style="tableRowStyle">
           <el-table-column
               prop="name"
               label="玩家昵称"
@@ -61,7 +61,7 @@
           >
           </el-table-column>
           <el-table-column
-              prop="ship"
+              prop="ship.name"
               label="使用船只"
               width="120">
           </el-table-column>
@@ -120,6 +120,20 @@ export default {
     this.getBattleData()
   },
   methods: {
+    tableRowStyle({row, rowIndex}) {
+      if (row.relation === 0) {
+        console.log()
+        return {
+          background: "rgb(225, 243, 216)"
+        }
+      }
+      if (row.private) {
+        return {
+          background: 'rgb(233, 233, 235)'
+        }
+      }
+      return '';
+    },
     getBattleData() {
       clearTimeout(this.timeout)
       this.$http.get('http://127.0.0.1:65000/tempArenaInfo.json')
@@ -155,7 +169,6 @@ export default {
           duration: 5000,
         });
       }
-      this.formatData()
       this.lastStatus = true
       this.setTimeout(1000)
     },
@@ -193,21 +206,41 @@ export default {
     createPlayersMap() {
       this.playersMap = new Map()
       let players = this.battleData.vehicles
+      let regex = /^:.+:$/
       players.forEach((player, index) => {
-        this.playersMap.set(player.name, {
-          name: player.name,
-          accountID: 0,
-          shipID: player.shipId,
-          relation: player.relation,
-          ship: '',
-          matches: '',
-          winrate: '',
-          avgdmg: '',
-          ship_matches: '',
-          ship_winrate: '',
-          ship_avgdmg: '',
-          private: false,
-        })
+        if (!regex.test(player.name)) {
+          this.playersMap.set(player.name, {
+            name: player.name,
+            accountID: 0,
+            shipID: player.shipId,
+            relation: player.relation,
+            ship: '',
+            rank: 0,
+            matches: '',
+            winrate: '',
+            avgdmg: '',
+            ship_matches: '',
+            ship_winrate: '',
+            ship_avgdmg: '',
+            private: false,
+          })
+        } else {
+          this.playersMap.set(player.name, {
+            name: player.name,
+            accountID: 0,
+            shipID: player.shipId,
+            relation: player.relation,
+            ship: '',
+            rank: 0,
+            matches: '电脑',
+            winrate: '电脑',
+            avgdmg: '电脑',
+            ship_matches: '电脑',
+            ship_winrate: '电脑',
+            ship_avgdmg: '电脑',
+            private: true,
+          })
+        }
       })
       this.getPlayersData()
       this.getShipsData()
@@ -217,8 +250,11 @@ export default {
       let accountIDsString = ''
       let playersNameString = ''
 
+      let regex = /^:.+:$/
       this.playersMap.forEach((player, index) => {
-        playersNameString = playersNameString + player.name + ','
+        if (!regex.test(player.name)) {
+          playersNameString = playersNameString + player.name + ','
+        }
       })
       playersNameString = playersNameString.substr(0, playersNameString.length - 1)
       this.$http.post('https://api.worldofwarships.asia/wows/account/list/', this.$qs.stringify({
@@ -232,7 +268,9 @@ export default {
           player.accountID = value.account_id
         })
         this.playersMap.forEach((player, index) => {
-          accountIDsString = accountIDsString + player.accountID + ','
+          if (!regex.test(player.name)) {
+            accountIDsString = accountIDsString + player.accountID + ','
+          }
         })
         accountIDsString = accountIDsString.substr(0, accountIDsString.length - 1)
         this.$http.post('https://api.worldofwarships.asia/wows/account/info/', this.$qs.stringify({
@@ -255,26 +293,30 @@ export default {
               player.private = true
             }
           }
+          this.formatData()
         })
         this.playersMap.forEach((player, index) => {
-          this.$http.post('https://api.worldofwarships.asia/wows/ships/stats/', this.$qs.stringify({
-            application_id: this.$env.VUE_APP_APPLICATION_ID,
-            account_id: player.accountID,
-            ship_id: player.shipID,
-          })).then(response => {
-            let playerData = response.data.data[player.accountID]
-            if (playerData) {
-              player.ship_matches = playerData[0].pvp.battles
-              player.ship_winrate = this.$util.calculatedPercentString(playerData[0].pvp.wins, playerData[0].pvp.battles, 2)
-              player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
-              player.private = false
-            } else {
-              player.ship_matches = '无数据'
-              player.ship_winrate = '无数据'
-              player.ship_avgdmg = '无数据'
-              player.private = true
-            }
-          })
+          if (!regex.test(player.name)) {
+            this.$http.post('https://api.worldofwarships.asia/wows/ships/stats/', this.$qs.stringify({
+              application_id: this.$env.VUE_APP_APPLICATION_ID,
+              account_id: player.accountID,
+              ship_id: player.shipID,
+            })).then(response => {
+              let playerData = response.data.data[player.accountID]
+              if (playerData) {
+                player.ship_matches = playerData[0].pvp.battles
+                player.ship_winrate = this.$util.calculatedPercentString(playerData[0].pvp.wins, playerData[0].pvp.battles, 2)
+                player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
+                player.private = false
+              } else {
+                player.ship_matches = '无数据'
+                player.ship_winrate = '无数据'
+                player.ship_avgdmg = '无数据'
+                player.private = true
+              }
+              this.formatData()
+            })
+          }
         })
       })
     },
@@ -288,29 +330,86 @@ export default {
       this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/ships/', this.$qs.stringify({
         application_id: this.$env.VUE_APP_APPLICATION_ID,
         ship_id: shipsIDString,
-        fields: 'name',
         language: 'zh-cn',
       })).then(response => {
         let ships = response.data.data
         for (let shipID in ships) {
           this.shipsMap.set(parseInt(shipID), ships[shipID])
         }
+        this.formatData()
       })
     },
     /*后续处理数据*/
     formatData() {
       this.tableDataL = []
       this.tableDataR = []
+
+      let tempTabelData = [], tempTableDataL = [], tempTableDataR = []
+
+      let mAirCarrier = [], mBattleship = [], mCruiser = [], mDestroyer = []
+
       this.playersMap.forEach((player, index) => {
-        if (this.shipsMap.size !== 0) {
-          player.ship = this.shipsMap.get(player.shipID).name
+        let ship = this.shipsMap.get(player.shipID)
+        if (ship) {
+          player.ship = ship
+          if (ship.nation === 'usa') {
+            player.rank = 0
+          } else if (ship.nation === 'uk') {
+            player.rank = 1
+          } else if (ship.nation === 'france') {
+            player.rank = 2
+          } else if (ship.nation === 'germany') {
+            player.rank = 3
+          } else if (ship.nation === 'italy') {
+            player.rank = 4
+          } else if (ship.nation === 'japan') {
+            player.rank = 5
+          } else if (ship.nation === 'ussr') {
+            player.rank = 6
+          } else if (ship.nation === 'pan_asia') {
+            player.rank = 7
+          } else if (ship.nation === 'europe') {
+            player.rank = 8
+          } else if (ship.nation === 'pan_america') {
+            player.rank = 9
+          }
+          if (ship.type === 'AirCarrier') {
+            mAirCarrier.push(player)
+          } else if (ship.type === 'Battleship') {
+            mBattleship.push(player)
+          } else if (ship.type === 'Cruiser') {
+            mCruiser.push(player)
+          } else if (ship.type === 'Destroyer') {
+            mDestroyer.push(player)
+          }
         }
+
+      })
+      tempTabelData = tempTabelData.concat(this.formartRank(mAirCarrier))
+      tempTabelData = tempTabelData.concat(this.formartRank(mBattleship))
+      tempTabelData = tempTabelData.concat(this.formartRank(mCruiser))
+      tempTabelData = tempTabelData.concat(this.formartRank(mDestroyer))
+      tempTabelData.forEach((player, index) => {
         if (player.relation !== 2) {
-          this.tableDataL.push(player)
+          tempTableDataL.push(player)
         } else {
-          this.tableDataR.push(player)
+          tempTableDataR.push(player)
         }
       })
+      this.tableDataL = tempTableDataL
+      this.tableDataR = tempTableDataR
+    },
+    /*对玩家按照船只国别进行排序*/
+    formartRank(players) {
+      let tempPlayers = players
+      for (var i = 1; i < tempPlayers.length; i++) {
+        for (var j = 0; j < tempPlayers.length - i; j++) {
+          if (tempPlayers[j].rank > tempPlayers[j + 1].rank) {
+            tempPlayers[j] = [tempPlayers[j + 1], tempPlayers[j + 1] = tempPlayers[j]][0];
+          }
+        }
+      }
+      return tempPlayers
     },
   }
 }
