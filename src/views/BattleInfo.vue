@@ -7,7 +7,7 @@
             style="width: 100%"
             :row-style="tableRowStyle">
           <el-table-column
-              prop="name"
+              prop="displayName"
               label="玩家昵称"
               width="200"
               :show-overflow-tooltip="true"
@@ -16,34 +16,40 @@
           <el-table-column
               prop="ship.name"
               label="使用船只"
-              width="120">
+              width="200">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="matches"
               label="匹配次数"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="winrate"
               label="胜率"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="avgdmg"
               label="场均伤害"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="ship_matches"
               label="船只次数"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="ship_winrate"
               label="船只胜率"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="ship_avgdmg"
               label="船只场均"
               width="80">
@@ -57,7 +63,7 @@
 
             :row-style="tableRowStyle">
           <el-table-column
-              prop="name"
+              prop="displayName"
               label="玩家昵称"
               width="200"
               :show-overflow-tooltip="true"
@@ -66,34 +72,40 @@
           <el-table-column
               prop="ship.name"
               label="使用船只"
-              width="120">
+              width="200">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="matches"
               label="匹配次数"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="winrate"
               label="胜率"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="avgdmg"
               label="场均伤害"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="ship_matches"
               label="船只次数"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="ship_winrate"
               label="船只胜率"
               width="80">
           </el-table-column>
           <el-table-column
+              align="center"
               prop="ship_avgdmg"
               label="船只场均"
               width="80">
@@ -214,6 +226,8 @@ export default {
         if (!regex.test(player.name)) {
           this.playersMap.set(player.name, {
             name: player.name,
+            clan: '',
+            displayName: '',
             accountID: 0,
             shipID: player.shipId,
             relation: player.relation,
@@ -270,9 +284,26 @@ export default {
           let player = this.playersMap.get(value.nickname)
           player.accountID = value.account_id
         })
+        //获取军团信息
         this.playersMap.forEach((player, index) => {
           if (!regex.test(player.name)) {
             accountIDsString = accountIDsString + player.accountID + ','
+          }
+        })
+        this.playersMap.forEach((player, index) => {
+          if (!regex.test(player.name)) {
+            this.$http.post('https://api.worldofwarships.asia/wows/clans/accountinfo/', this.$qs.stringify({
+              application_id: this.$env.VUE_APP_APPLICATION_ID,
+              account_id: player.accountID,
+              extra: 'clan',
+              fields: 'clan.tag',
+            })).then(response => {
+              let clan = response.data.data[player.accountID].clan
+              if (clan) {
+                player.clan = clan.tag
+                player.displayName = '[' + player.clan + ']' + player.name
+              }
+            })
           }
         })
         accountIDsString = accountIDsString.substr(0, accountIDsString.length - 1)
@@ -336,7 +367,13 @@ export default {
         language: 'zh-cn',
       })).then(response => {
         let ships = response.data.data
+        //获取中文翻译数据
+        let zh_CN = JSON.parse(localStorage.getItem('zh_CN'))
         for (let shipID in ships) {
+          if (zh_CN && zh_CN.ships[shipID]) {
+            //船名中文化
+            ships[shipID].name = zh_CN.ships[shipID]
+          }
           this.shipsMap.set(parseInt(shipID), ships[shipID])
         }
         this.formatData()
@@ -386,7 +423,6 @@ export default {
             mDestroyer.push(player)
           }
         }
-
       })
       tempTabelData = tempTabelData.concat(this.formartRank(mAirCarrier))
       tempTabelData = tempTabelData.concat(this.formartRank(mBattleship))
