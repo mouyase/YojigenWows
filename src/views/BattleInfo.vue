@@ -10,6 +10,7 @@
               prop="name"
               label="玩家昵称"
               width="200"
+              :show-overflow-tooltip="true"
           >
           </el-table-column>
           <el-table-column
@@ -53,11 +54,13 @@
         <el-table
             :data="tableDataR"
             style="width: 100%"
+
             :row-style="tableRowStyle">
           <el-table-column
               prop="name"
               label="玩家昵称"
               width="200"
+              :show-overflow-tooltip="true"
           >
           </el-table-column>
           <el-table-column
