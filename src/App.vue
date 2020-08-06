@@ -34,7 +34,6 @@ export default {
 </script>
 <style lang="scss">
 body {
-  //background-color: #0b344d;
   padding: 0;
   margin: 0;
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
@@ -47,14 +46,23 @@ a {
 #app {
   .el-header {
     padding: 0;
+    //display: flex;
+    //justify-content: center;
+    //align-items: center;
   }
 
   .el-main {
     padding: 0;
+    //display: flex;
+    //justify-content: center;
+    //align-items: center;
   }
 
   .el-footer {
     padding: 0;
+    //display: flex;
+    //justify-content: center;
+    //align-items: center;
   }
 }
 </style>

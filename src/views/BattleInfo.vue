@@ -1,11 +1,14 @@
 <template>
   <div class="battleinfo">
-    <el-row>
-      <el-col :span="12">
-        <el-table
-            :data="tableDataL"
-            style="width: 100%"
-            :row-style="tableRowStyle">
+    <div class="battleinfo-table">
+      <el-table
+          :data="tableDataL"
+          style="width: 100%"
+          :row-style="tableRowStyle"
+          :header-cell-style="tableHeaderCellStyleL">
+<!--          :show-summary="true"-->
+<!--          :summary-method="tableSummaryL"-->
+        <el-table-column label="我的团队">
           <el-table-column
               prop="displayName"
               label="玩家昵称"
@@ -16,7 +19,8 @@
           <el-table-column
               prop="ship.name"
               label="使用船只"
-              width="200">
+              width="200"
+              :show-overflow-tooltip="true">
           </el-table-column>
           <el-table-column
               align="center"
@@ -54,14 +58,16 @@
               label="船只场均"
               width="80">
           </el-table-column>
-        </el-table>
-      </el-col>
-      <el-col :span="12">
-        <el-table
-            :data="tableDataR"
-            style="width: 100%"
-
-            :row-style="tableRowStyle">
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="battleinfo-table">
+      <el-table
+          :data="tableDataR"
+          style="width: 100%"
+          :row-style="tableRowStyle"
+          :header-cell-style="tableHeaderCellStyleR">
+        <el-table-column label="敌军">
           <el-table-column
               prop="displayName"
               label="玩家昵称"
@@ -72,7 +78,8 @@
           <el-table-column
               prop="ship.name"
               label="使用船只"
-              width="200">
+              width="200"
+              :show-overflow-tooltip="true">
           </el-table-column>
           <el-table-column
               align="center"
@@ -110,9 +117,9 @@
               label="船只场均"
               width="80">
           </el-table-column>
-        </el-table>
-      </el-col>
-    </el-row>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 
@@ -137,18 +144,39 @@ export default {
   methods: {
     tableRowStyle({row, rowIndex}) {
       if (row.relation === 0) {
-        console.log()
         return {
-          background: "rgb(225, 243, 216)"
+          'background': "rgb(240, 249, 235)",
         }
       }
       if (row.private) {
         return {
-          background: 'rgb(233, 233, 235)'
+          'background': 'rgb(244, 244, 245)',
         }
       }
       return '';
     },
+    tableHeaderCellStyleL({row, rowIndex, columnIndex}) {
+      if (rowIndex === 0 && columnIndex === 0)
+        return {
+          'background': "#67C23A",
+          'color': "#FFFFFF",
+          'font-size': "24px",
+        }
+      return ''
+    },
+    tableHeaderCellStyleR({row, rowIndex, columnIndex}) {
+      if (rowIndex === 0 && columnIndex === 0)
+        return {
+          'background': "#F56C6C",
+          'color': "#FFFFFF",
+          'font-size': "24px",
+        }
+      return ''
+    },
+    // tableSummaryL(params) {
+    //   console.log(params)
+    //   return ['哈哈']
+    // },
     getBattleData() {
       clearTimeout(this.timeout)
       this.$http.get('http://127.0.0.1:65000/tempArenaInfo.json')
@@ -459,4 +487,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.battleinfo {
+  display: flex;
+  justify-content: center;
+  //align-items: center;
+
+  .battleinfo-table {
+    margin: 8px;
+  }
+}
 </style>
