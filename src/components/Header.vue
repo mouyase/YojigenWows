@@ -61,11 +61,17 @@ export default {
   .header-content {
     width: 1920px;
     display: flex;
+    height: 60px;
     justify-content: space-between;
     align-items: center;
 
     .header-logo {
       display: flex;
+      width: 230px;
+      height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 }
