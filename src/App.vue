@@ -25,6 +25,7 @@ export default {
   },
   mounted() {
     this.$http.get('https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/zh_CN.json')
+    this.$http.get('/zh_CN.json')
         .then(response => {
           localStorage.setItem('zh_CN', JSON.stringify(response.data))
         })
@@ -52,6 +53,7 @@ body {
     //display: flex;
     //justify-content: center;
     //align-items: center;
+    background: #333;
   }
 
   .el-main {

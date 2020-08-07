@@ -11,7 +11,7 @@ export default {
   components: {},
   mounted() {
     this.$http.get(
-        'https://wows.128512.xyz/zh-sg/news/general-news/german-carriers-part-2/?pjax=1')
+        'https://wows.128512.xyz/zh-sg/news/?update=&page=1')
         .then(response => {
           console.log(response)
         })

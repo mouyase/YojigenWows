@@ -428,8 +428,13 @@ export default {
             let player = this.playersMap.get(playerData.nickname)
             if (playerData.statistics) {
               player.matches = playerData.statistics.pvp.battles
-              player.winrate = this.$util.calculatedPercentString(playerData.statistics.pvp.wins, playerData.statistics.pvp.battles, 2)
-              player.avgdmg = parseInt(((playerData.statistics.pvp.damage_dealt / playerData.statistics.pvp.battles) / 100)) * 100
+              if (player.matches === 0) {
+                player.winrate = '0%'
+                player.avgdmg = 0
+              } else {
+                player.winrate = this.$util.calculatedPercentString(playerData.statistics.pvp.wins, playerData.statistics.pvp.battles, 2)
+                player.avgdmg = parseInt(((playerData.statistics.pvp.damage_dealt / playerData.statistics.pvp.battles) / 100)) * 100
+              }
               player.private = false
             } else {
               player.matches = '无数据'
@@ -450,8 +455,13 @@ export default {
               let playerData = response.data.data[player.accountID]
               if (playerData) {
                 player.ship_matches = playerData[0].pvp.battles
-                player.ship_winrate = this.$util.calculatedPercentString(playerData[0].pvp.wins, playerData[0].pvp.battles, 2)
-                player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
+                if (player.ship_matches === 0) {
+                  player.ship_winrate = '0%'
+                  player.ship_avgdmg = 0
+                } else {
+                  player.ship_winrate = this.$util.calculatedPercentString(playerData[0].pvp.wins, playerData[0].pvp.battles, 2)
+                  player.ship_avgdmg = parseInt(((playerData[0].pvp.damage_dealt / playerData[0].pvp.battles) / 100)) * 100
+                }
                 player.private = false
               } else {
                 player.ship_matches = '无数据'
@@ -481,9 +491,9 @@ export default {
         //获取中文翻译数据
         let zh_CN = JSON.parse(localStorage.getItem('zh_CN'))
         for (let shipID in ships) {
-          if (zh_CN && zh_CN.ships[shipID]) {
+          if (zh_CN && zh_CN.ships_name[ships[shipID].ship_id_str]) {
             //船名中文化
-            ships[shipID].name = zh_CN.ships[shipID]
+            ships[shipID].name = zh_CN.ships_name[ships[shipID].ship_id_str]
           }
           this.shipsMap.set(parseInt(shipID), ships[shipID])
         }

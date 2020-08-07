@@ -1,23 +1,24 @@
 <template>
   <div class="header">
-    <div class="header-logo">
-      <img src="https://wows-static-production.gcdn.co/wowsp/80a8ce9e/assetsV2/ee10ad95160443e5741917dcf1c3d330.png">
-<!--      <div>-->
-<!--        四次元战舰世界-->
-<!--      </div>-->
-    </div>
-    <div>
-      <el-menu :default-active="$route.path" :router=true mode="horizontal">
-        <el-menu-item index="/">首页</el-menu-item>
-        <el-menu-item index="/info">水表</el-menu-item>
-        <el-menu-item index="/battleinfo">对战水表</el-menu-item>
-        <el-menu-item index="" v-if="oauth===null||oauth.status!=='ok'" @click="login" >登陆</el-menu-item>
-        <el-submenu index="" v-if="oauth!==null&&oauth.status==='ok'">
-          <template slot="title">{{ oauth.nickname }}</template>
-          <el-menu-item index="">我的信息</el-menu-item>
-          <el-menu-item index="" @click="logout">登出</el-menu-item>
-        </el-submenu>
-      </el-menu>
+    <div class="header-content">
+      <div class="header-logo">
+        <el-image style="height: 40px" fit="contain"
+                  src="https://wows-static-production.gcdn.co/wowsp/80a8ce9e/assetsV2/ee10ad95160443e5741917dcf1c3d330.png">
+        </el-image>
+      </div>
+      <div>
+        <el-menu :default-active="$route.path" :router=true mode="horizontal">
+          <el-menu-item index="/">首页</el-menu-item>
+          <el-menu-item index="/info">水表</el-menu-item>
+          <el-menu-item index="/battleinfo">对战水表</el-menu-item>
+          <el-menu-item index="" v-if="oauth===null||oauth.status!=='ok'" @click="login">登陆</el-menu-item>
+          <el-submenu index="" v-if="oauth!==null&&oauth.status==='ok'">
+            <template slot="title">{{ oauth.nickname }}</template>
+            <el-menu-item index="">我的信息</el-menu-item>
+            <el-menu-item index="" @click="logout">登出</el-menu-item>
+          </el-submenu>
+        </el-menu>
+      </div>
     </div>
   </div>
 </template>
@@ -54,10 +55,18 @@ export default {
 .header {
   height: 60px;
   display: flex;
-  justify-content: space-between;
-}
+  justify-content: center;
+  align-items: center;
 
-.header-logo {
-  display: flex;
+  .header-content {
+    width: 1920px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-logo {
+      display: flex;
+    }
+  }
 }
 </style>
