@@ -10,14 +10,16 @@
       <div class="home-content">
         <el-card v-for="news in newsData" shadow="hover" :body-style="{ padding: '0px',height:'100%'}">
           <div class="news-body">
-            <div class="news-header" :style="'background-image: url('+news.cover+')'">
-              <div class="news-header-category">{{ news.category }}</div>
-              <div class="news-header-date">{{ news.date }}</div>
-            </div>
-            <div class="news-content">
-              <div class="news-content-title">{{ news.title }}</div>
-              <br>
-              <div class="news-content-description">{{ news.description }}</div>
+            <div>
+              <div class="news-header" :style="'background-image: url('+news.cover+')'">
+                <div class="news-header-category">{{ news.category }}</div>
+                <div class="news-header-date">{{ news.date }}</div>
+              </div>
+              <div class="news-content">
+                <div class="news-content-title">{{ news.title }}</div>
+                <br>
+                <div class="news-content-description">{{ news.description }}</div>
+              </div>
             </div>
             <div class="news-content-link">
               <el-link type="primary" :href="'https://worldofwarships.asia'+news.link" target="_blank">查看更多<i
@@ -161,7 +163,7 @@ export default {
             }
 
             .news-content-description {
-              font-size: 18px;
+              font-size: 16px;
               color: #666;
             }
           }
