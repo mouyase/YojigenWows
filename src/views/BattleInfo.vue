@@ -21,11 +21,11 @@
               :show-overflow-tooltip="true">
             <template slot-scope="scope">
               <div style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
-                <el-image style="width: 24px; height: 24px;" :src="scope.row.shipIconURL"></el-image>
-                <span style="margin-left: 8px" v-if="scope.row.ship.is_premium">{{
+                <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
+                <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
                     tierStrings[scope.row.ship.tier]
                   }} {{ scope.row.ship.name }}</span>
-                <span style="margin-left: 8px" v-if="!scope.row.ship.is_premium">{{
+                <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
                     tierStrings[scope.row.ship.tier]
                   }} {{ scope.row.ship.name }}</span>
               </div>
@@ -90,11 +90,11 @@
               :show-overflow-tooltip="true">
             <template slot-scope="scope">
               <div style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
-                <el-image style="width: 24px; height: 24px;" :src="scope.row.shipIconURL"></el-image>
-                <span style="margin-left: 8px" v-if="scope.row.ship.is_premium">{{
+                <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
+                <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
                     tierStrings[scope.row.ship.tier]
                   }} {{ scope.row.ship.name }}</span>
-                <span style="margin-left: 8px" v-if="!scope.row.ship.is_premium">{{
+                <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
                     tierStrings[scope.row.ship.tier]
                   }} {{ scope.row.ship.name }}</span>
               </div>
@@ -491,9 +491,9 @@ export default {
         //获取中文翻译数据
         let zh_CN = JSON.parse(localStorage.getItem('zh_CN'))
         for (let shipID in ships) {
-          if (zh_CN && zh_CN.ships_name[ships[shipID].ship_id_str]) {
+          if (zh_CN && zh_CN[ships[shipID].ship_id_str]) {
             //船名中文化
-            ships[shipID].name = zh_CN.ships_name[ships[shipID].ship_id_str]
+            ships[shipID].name = zh_CN[ships[shipID].ship_id_str]
           }
           this.shipsMap.set(parseInt(shipID), ships[shipID])
         }
