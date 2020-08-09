@@ -30,6 +30,11 @@ const routes = [
         name: 'Dev',
         component: () => import('@/views/Dev.vue')
     },
+    {
+        path: '/info/:playerName',
+        name: 'Info',
+        component: () => import('@/views/Info.vue')
+    },
 ]
 
 const router = new VueRouter({

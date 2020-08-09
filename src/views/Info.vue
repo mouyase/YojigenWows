@@ -19,6 +19,7 @@ export default {
   name: "Info",
   data() {
     return {
+      params: this.$route.query,
       queryNickName: '_MoeArthur_',
       region: 0
     }
