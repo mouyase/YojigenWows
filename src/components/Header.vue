@@ -7,7 +7,12 @@
         </el-image>
       </div>
       <div>
-        <el-menu :default-active="$route.path" :router=true mode="horizontal">
+        <el-menu :default-active="$route.path"
+                 :router=true
+                 mode="horizontal"
+                 background-color="#333"
+                 text-color="#eee"
+                 active-text-color="#eee">
           <el-menu-item index="/">首页</el-menu-item>
           <el-menu-item index="/info">水表</el-menu-item>
           <el-menu-item index="/battleinfo">对战水表</el-menu-item>
@@ -72,6 +77,10 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+
+    .el-menu.el-menu--horizontal {
+      border-bottom: 0;
     }
   }
 }

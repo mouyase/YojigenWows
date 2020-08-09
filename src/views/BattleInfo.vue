@@ -280,7 +280,7 @@ export default {
       if (!this.lastStatus) {
         this.$notify.success({
           title: '已连接到对局',
-          message: '对局数据获取中，请稍作等待',
+          message: '对局数据获取中，请您稍作等待',
           position: 'bottom-right',
           duration: 5000,
         });
@@ -290,9 +290,9 @@ export default {
     },
     errorServer() {
       this.$notify.error({
-        title: '无法连接到游戏服务',
+        title: '无法连接到本地服务',
         dangerouslyUseHTMLString: true,
-        message: '请确保数据服务已安装<br>如未安装可以<a href="/YojigenWowsInfoServerSetup.exe"><strong>点击这里下载</strong></a><br>如已安装可以<a href="YojigenWowsInfoServer://open"><strong>点击这里启动</strong></a>',
+        message: '请确保本地服务插件<strong>安装到游戏根目录</strong><br><br><a href="/YojigenWowsInfoServerSetup.exe"><strong>下载插件</strong></a> | <a href="YojigenWowsInfoServer://open"><strong>启动插件</strong></a>',
         position: 'bottom-right',
         duration: 10000,
       });
@@ -302,7 +302,8 @@ export default {
     errorBattle() {
       this.$notify.warning({
         title: '无法找到对局',
-        message: '若已开始对局，请您等待片刻',
+        dangerouslyUseHTMLString: true,
+        message: '请确保本地服务插件<strong>安装到游戏根目录</strong><br><br>若已开始对局，请您稍作等待',
         position: 'bottom-right',
         duration: 5000,
       });
@@ -581,7 +582,6 @@ export default {
 .battleinfo {
   display: flex;
   justify-content: center;
-  //align-items: center;
 
   .battleinfo-table {
     margin: 8px;
