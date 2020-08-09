@@ -35,6 +35,11 @@ const routes = [
         name: 'Database',
         component: () => import('@/views/Database.vue')
     },
+    {
+        path: '/info/:playerName',
+        name: 'Info',
+        component: () => import('@/views/Info.vue')
+    },
 ]
 
 const router = new VueRouter({
