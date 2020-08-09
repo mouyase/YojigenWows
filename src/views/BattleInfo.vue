@@ -20,15 +20,23 @@
               width="200"
               :show-overflow-tooltip="true">
             <template slot-scope="scope">
-              <div style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
-                <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
-                <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
-                    tierStrings[scope.row.ship.tier]
-                  }} {{ scope.row.ship.name }}</span>
-                <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
-                    tierStrings[scope.row.ship.tier]
-                  }} {{ scope.row.ship.name }}</span>
-              </div>
+              <el-popover
+                  popper-class="shipcard-popover"
+                  :visible-arrow="false"
+                  placement="right"
+                  trigger="hover"
+              >
+                <ShipCard :shipData="scope.row.ship"/>
+                <div slot="reference" style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
+                  <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
+                  <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
+                      tierStrings[scope.row.ship.tier]
+                    }} {{ scope.row.ship.name }}</span>
+                  <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
+                      tierStrings[scope.row.ship.tier]
+                    }} {{ scope.row.ship.name }}</span>
+                </div>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column
@@ -89,15 +97,23 @@
               width="200"
               :show-overflow-tooltip="true">
             <template slot-scope="scope">
-              <div style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
-                <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
-                <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
-                    tierStrings[scope.row.ship.tier]
-                  }} {{ scope.row.ship.name }}</span>
-                <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
-                    tierStrings[scope.row.ship.tier]
-                  }} {{ scope.row.ship.name }}</span>
-              </div>
+              <el-popover
+                  popper-class="shipcard-popover"
+                  :visible-arrow="false"
+                  placement="left"
+                  trigger="hover"
+              >
+                <ShipCard :shipData="scope.row.ship"/>
+                <div slot="reference" style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
+                  <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
+                  <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
+                      tierStrings[scope.row.ship.tier]
+                    }} {{ scope.row.ship.name }}</span>
+                  <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
+                      tierStrings[scope.row.ship.tier]
+                    }} {{ scope.row.ship.name }}</span>
+                </div>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column
@@ -143,8 +159,13 @@
 </template>
 
 <script>
+import ShipCard from '@/components/ShipCard'
+
 export default {
   name: "BattleInfo",
+  components: {
+    ShipCard,
+  },
   data() {
     return {
       battleData: {},
@@ -176,46 +197,31 @@ export default {
   },
   methods: {
     tableCellStyle({row, column, rowIndex, columnIndex}) {
+      let style = {
+        'background': "#555",
+        'color': "#ddd",
+      }
       if (row.private) {
-        return {
-          'background': "#333",
-          'color': "#DDD",
-          'font-weight': 'bold',
-        }
+        style['background'] = "#333"
       }
       if (columnIndex == 0 && row.relation === 0) {
-        return {
-          'background': "#555",
-          'color': "#FC8",
-          'font-weight': 'bold',
-        }
+        style['color'] = "#FC8"
+        style['font-weight'] = "bold"
       }
       if (columnIndex == 0) {
-        return {
-          'background': "#555",
-          'color': "#DDD",
-          'font-weight': 'bold',
-        }
+        style['color'] = "#ddd"
+        style['font-weight'] = "bold"
       }
       if (columnIndex == 1) {
         if (row.ship.is_premium) {
-          return {
-            'background': "#555",
-            'color': "#FC8",
-            'font-weight': 'bold',
-          }
+          style['color'] = "#FC8"
+          style['font-weight'] = "bold"
         } else {
-          return {
-            'background': "#555",
-            'color': "#DDD",
-            'font-weight': 'bold',
-          }
+          style['color'] = "#ddd"
+          style['font-weight'] = "bold"
         }
       }
-      return {
-        'background': "#555555FF",
-        'color': "#DDD",
-      }
+      return style
     },
     tableHeaderCellStyleL({row, rowIndex, columnIndex}) {
       if (rowIndex === 0 && columnIndex === 0)
@@ -586,5 +592,10 @@ export default {
   .battleinfo-table {
     margin: 8px;
   }
+}
+</style>
+<style lang="scss">
+.shipcard-popover {
+  padding: 0;
 }
 </style>

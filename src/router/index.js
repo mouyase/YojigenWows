@@ -11,11 +11,6 @@ const routes = [
         component: Home
     },
     {
-        path: '/info',
-        name: 'Info',
-        component: () => import('@/views/Info.vue')
-    },
-    {
         path: '/battleinfo',
         name: 'BattleInfo',
         component: () => import('@/views/BattleInfo.vue')
@@ -31,13 +26,19 @@ const routes = [
         component: () => import('@/views/Dev.vue')
     },
     {
-        path: '/database/:shipID',
-        name: 'Database',
+        path: '/database',
         component: () => import('@/views/Database.vue')
     },
     {
+        path: '/database/:shipID',
+        component: () => import('@/views/Database.vue')
+    },
+    {
+        path: '/info',
+        component: () => import('@/views/Info.vue')
+    },
+    {
         path: '/info/:playerName',
-        name: 'Info',
         component: () => import('@/views/Info.vue')
     },
 ]
