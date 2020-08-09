@@ -572,11 +572,11 @@ export default {
       this.tableDataL = this.formartRank(tempTableDataL)
       this.tableDataR = this.formartRank(tempTableDataR)
     },
-    /*对玩家按照类型，等级，国别进行排序*/
+    /*对玩家按照类型，等级，国别，名称进行排序*/
     formartRank(players) {
       let tempPlayers = players
       tempPlayers.sort((a, b) => {
-        return a.typeRank - b.typeRank || b.tierRank - a.tierRank || a.nationRank - b.nationRank
+        return a.typeRank - b.typeRank || b.tierRank - a.tierRank || a.nationRank - b.nationRank || a.name - b.name
       })
       return tempPlayers
     },
