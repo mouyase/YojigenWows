@@ -123,13 +123,18 @@ export default {
       cnStrings: JSON.parse(localStorage.getItem('zh_CN')),
     }
   },
-  mounted() {
-    if (this.shipData) {
-      this.data = this.shipData
-    } else {
-      if (this.shipID !== 0) {
-        this.getShipData()
-      }
+  watch: {
+    shipData: {
+      handler(newValue, oldVallue) {
+        if (newValue) {
+          this.data = newValue
+        } else {
+          if (this.shipID !== 0) {
+            this.getShipData()
+          }
+        }
+      },
+      immediate: true,
     }
   },
   methods: {
