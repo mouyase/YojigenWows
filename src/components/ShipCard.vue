@@ -3,10 +3,10 @@
     <div class="shipcard-header">
       <div class="shipcard-header-premium" v-if="data.is_premium">
         <div class="shipcard-header-title">
-          <img style="width: 27px; height: 27px;flex-shrink:0;" :src="getShipIcon(data)"/>
+          <img style="width: 27px; height: 27px;flex-shrink:0;" :src="this.$wows.getShipIcon(data)"/>
           <div style="margin-left: 4px">{{
               tierStrings[data.tier]
-            }} {{ getCNString(data.ship_id_str) }}
+            }} {{ $wows.getText(data.ship_id_str) }}
           </div>
         </div>
         <div class="shipcard-header-type">
@@ -18,10 +18,10 @@
       </div>
       <div class="shipcard-header-normal" v-if="!data.is_premium">
         <div class="shipcard-header-title">
-          <img style="width: 27px; height: 27px;flex-shrink:0;" :src="getShipIcon(data)"/>
+          <img style="width: 27px; height: 27px;flex-shrink:0;" :src="this.$wows.getShipIcon(data)"/>
           <div style="margin-left: 4px">{{
               tierStrings[data.tier]
-            }} {{ getCNString(data.ship_id_str) }}
+            }} {{ $wows.getText(data.ship_id_str) }}
           </div>
         </div>
         <div class="shipcard-header-type">
@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="shipcard-content">
-      {{ data.description }}
+      {{ $wows.getText(data.ship_id_str + '_DESCR') }}
     </div>
     <div class="shipcard-footer">
       <div class="shipcard-props" v-if="data.default_profile">
@@ -120,7 +120,6 @@ export default {
         10: 'X',
       },
       encyclopedia: JSON.parse(localStorage.getItem('encyclopedia')),
-      cnStrings: JSON.parse(localStorage.getItem('zh_CN')),
     }
   },
   watch: {
@@ -139,7 +138,7 @@ export default {
   },
   methods: {
     getShipData() {
-      this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/ships/', this.$qs.stringify({
+      this.$http.post(this.$wows.getAPIHost() + '/wows/encyclopedia/ships/', this.$qs.stringify({
         application_id: this.$env.VUE_APP_APPLICATION_ID,
         ship_id: this.shipID,
         language: 'zh-tw',
@@ -156,11 +155,6 @@ export default {
         } else {
           return this.encyclopedia.ship_type_images[ship.type].image_elite
         }
-      }
-    },
-    getCNString(key) {
-      if (this.cnStrings[key]) {
-        return this.cnStrings[key]
       }
     },
     getShipTypeString(ship) {

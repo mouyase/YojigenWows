@@ -1,5 +1,5 @@
 module.exports = {
-    publicPath: '',
+    publicPath: 'https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/',
     chainWebpack: config => {
         config
             .plugin('html')
@@ -8,12 +8,4 @@ module.exports = {
                 return args
             })
     },
-    // devServer: {
-    //     proxy: {
-    //         '/': {
-    //             target: 'https://worldofwarships.asia',
-    //             changedTouches: true,
-    //         }
-    //     },
-    // }
 }

@@ -23,18 +23,26 @@ export default {
     Header,
     Footer,
   },
+  beforeCreate() {
+    // this.$http.get('https://cdn.jsdelivr.net/gh/mouyase/WowsStrings@gh-pages/zh/LC_MESSAGES/global.po')
+    //     .then(response => {
+    //       // console.log(response.data)
+    //     })
+  },
   mounted() {
-    this.$http.get('https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/zh_CN.json')
-    this.$http.get('/zh_CN.json')
-        .then(response => {
-          localStorage.setItem('zh_CN', JSON.stringify(response.data))
-        })
-    this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/info/', this.$qs.stringify({
-      application_id: this.$env.VUE_APP_APPLICATION_ID,
-      language: 'zh-cn',
-    })).then(response => {
-      localStorage.setItem('encyclopedia', JSON.stringify(response.data.data))
-    })
+    // this.$http.get('https://cdn.jsdelivr.net/gh/mouyase/YojigenWows@gh-pages/zh_CN.json')
+    // this.$http.get('/zh_CN.json')
+    //     .then(response => {
+    //       localStorage.setItem('zh_CN', JSON.stringify(response.data))
+    //     })
+  },
+  methods: {
+    // getLanguageData() {
+    //   this.$http.get('https://cdn.jsdelivr.net/gh/mouyase/WowsStrings@gh-pages/zh/LC_MESSAGES/global.po')
+    //       .then(response => {
+    //         console.log(response.data)
+    //       })
+    // },
   }
 }
 </script>

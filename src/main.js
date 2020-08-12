@@ -10,6 +10,7 @@ import qs from 'qs'
 import '@/permission'
 import '@/interceptors'
 import util from '@/util'
+import wows from '@/wows'
 
 Vue.config.productionTip = false
 
@@ -20,6 +21,7 @@ Vue.use(VueJsonp)
 Vue.prototype.$env = process.env
 Vue.prototype.$qs = qs
 Vue.prototype.$util = util
+Vue.prototype.$wows = wows
 
 
 new Vue({

@@ -76,7 +76,6 @@ export default {
             this.newsData.sort((a, b) => {
               return b.timeStamp - a.timeStamp
             })
-            console.log(this.newsData)
           })
     }
   }

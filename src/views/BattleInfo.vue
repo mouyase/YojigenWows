@@ -28,13 +28,14 @@
               >
                 <ShipCard :shipData="scope.row.ship"/>
                 <div slot="reference" style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
-                  <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
+                  <el-image style="width: 24px; height: 24px;flex-shrink:0;"
+                            :src="$wows.getShipIcon(scope.row.ship)"></el-image>
                   <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
                       tierStrings[scope.row.ship.tier]
-                    }} {{ scope.row.ship.name }}</span>
+                    }} {{ $wows.getText(scope.row.ship.ship_id_str) }}</span>
                   <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
                       tierStrings[scope.row.ship.tier]
-                    }} {{ scope.row.ship.name }}</span>
+                    }} {{ $wows.getText(scope.row.ship.ship_id_str) }}</span>
                 </div>
               </el-popover>
             </template>
@@ -105,13 +106,13 @@
               >
                 <ShipCard :shipData="scope.row.ship"/>
                 <div slot="reference" style="display:flex;align-items: center;justify-content:left;overflow: hidden;">
-                  <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="scope.row.shipIconURL"></el-image>
+                  <el-image style="width: 24px; height: 24px;flex-shrink:0;" :src="$wows.getShipIcon(scope.row.ship)"></el-image>
                   <span style="margin-left: 4px" v-if="scope.row.ship.is_premium">{{
                       tierStrings[scope.row.ship.tier]
-                    }} {{ scope.row.ship.name }}</span>
+                    }} {{ $wows.getText(scope.row.ship.ship_id_str) }}</span>
                   <span style="margin-left: 4px" v-if="!scope.row.ship.is_premium">{{
                       tierStrings[scope.row.ship.tier]
-                    }} {{ scope.row.ship.name }}</span>
+                    }} {{ $wows.getText(scope.row.ship.ship_id_str) }}</span>
                 </div>
               </el-popover>
             </template>
@@ -341,7 +342,6 @@ export default {
             shipID: player.shipId,
             relation: player.relation,
             ship: {},
-            shipIconURL: '',
             typeRank: 0,
             tierRank: 0,
             nationRank: 0,
@@ -362,7 +362,6 @@ export default {
             shipID: player.shipId,
             relation: player.relation,
             ship: {},
-            shipIconURL: '',
             typeRank: 0,
             tierRank: 0,
             nationRank: 0,
@@ -391,7 +390,7 @@ export default {
         }
       })
       playersNameString = playersNameString.substr(0, playersNameString.length - 1)
-      this.$http.post('https://api.worldofwarships.asia/wows/account/list/', this.$qs.stringify({
+      this.$http.post(this.$wows.getAPIHost() + '/wows/account/list/', this.$qs.stringify({
         application_id: this.$env.VUE_APP_APPLICATION_ID,
         search: playersNameString,
         type: 'exact',
@@ -409,7 +408,7 @@ export default {
         })
         this.playersMap.forEach((player, index) => {
           if (!regex.test(player.name)) {
-            this.$http.post('https://api.worldofwarships.asia/wows/clans/accountinfo/', this.$qs.stringify({
+            this.$http.post(this.$wows.getAPIHost() + '/wows/clans/accountinfo/', this.$qs.stringify({
               application_id: this.$env.VUE_APP_APPLICATION_ID,
               account_id: player.accountID,
               extra: 'clan',
@@ -425,7 +424,7 @@ export default {
           }
         })
         accountIDsString = accountIDsString.substr(0, accountIDsString.length - 1)
-        this.$http.post('https://api.worldofwarships.asia/wows/account/info/', this.$qs.stringify({
+        this.$http.post(this.$wows.getAPIHost() + '/wows/account/info/', this.$qs.stringify({
           application_id: this.$env.VUE_APP_APPLICATION_ID,
           account_id: accountIDsString,
         })).then(response => {
@@ -454,7 +453,7 @@ export default {
         })
         this.playersMap.forEach((player, index) => {
           if (!regex.test(player.name)) {
-            this.$http.post('https://api.worldofwarships.asia/wows/ships/stats/', this.$qs.stringify({
+            this.$http.post(this.$wows.getAPIHost() + '/wows/ships/stats/', this.$qs.stringify({
               application_id: this.$env.VUE_APP_APPLICATION_ID,
               account_id: player.accountID,
               ship_id: player.shipID,
@@ -489,19 +488,19 @@ export default {
         shipsIDString = shipsIDString + player.shipID + ','
       })
       shipsIDString = shipsIDString.substr(0, shipsIDString.length - 1)
-      this.$http.post('https://api.worldofwarships.asia/wows/encyclopedia/ships/', this.$qs.stringify({
+      this.$http.post(this.$wows.getAPIHost() + '/wows/encyclopedia/ships/', this.$qs.stringify({
         application_id: this.$env.VUE_APP_APPLICATION_ID,
         ship_id: shipsIDString,
         language: 'zh-cn',
       })).then(response => {
         let ships = response.data.data
         //获取中文翻译数据
-        let zh_CN = JSON.parse(localStorage.getItem('zh_CN'))
+        // let zh_CN = JSON.parse(localStorage.getItem('zh_CN'))
         for (let shipID in ships) {
-          if (zh_CN && zh_CN[ships[shipID].ship_id_str]) {
-            //船名中文化
-            ships[shipID].name = zh_CN[ships[shipID].ship_id_str]
-          }
+          // if (zh_CN && zh_CN[ships[shipID].ship_id_str]) {
+          //   船名中文化
+          // ships[shipID].name = zh_CN[ships[shipID].ship_id_str]
+          // }
           this.shipsMap.set(parseInt(shipID), ships[shipID])
         }
         this.formatData()
@@ -554,11 +553,6 @@ export default {
             player.typeRank = 3
           }
           player.tierRank = player.ship.tier
-        }
-        if (ship.is_premium) {
-          player.shipIconURL = this.encyclopedia.ship_type_images[ship.type].image_premium
-        } else {
-          player.shipIconURL = this.encyclopedia.ship_type_images[ship.type].image_elite
         }
         tempTabelData.push(player)
       })
